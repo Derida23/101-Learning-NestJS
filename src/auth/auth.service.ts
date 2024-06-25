@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { comparePasswords, hashPassword } from 'utils/hash-password.util';
@@ -46,7 +46,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { username: user.name, sub: user.id };
+    const payload = { email: user.email, sub: user.id };
 
 
     const access_token = this.jwtService.sign(payload, {
@@ -58,17 +58,33 @@ export class AuthService {
     return this.buildResponse(user, "Successfully logged in", access_token);
   }
 
+  async profile(id: number) {
+    const user = await this.prisma.users.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    
+    return this.buildResponse(user, "Successfully get profile")
+  }
+
   private buildResponse(user: User, message: string, access_token = null): { message: string; data: Partial<User>; statusCode: number } {
+    const payload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      access_token,
+    }
+
+    if (!access_token) {
+      delete payload['access_token'];   
+    }
+
     return {
       message: message,
-      data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar,
-        access_token,
-      },
+      data: payload,
       statusCode: 200,
     };
   }
