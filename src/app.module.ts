@@ -18,7 +18,8 @@ import { AuthController } from './auth/auth.controller';
     TrainingModule,
     TaskModule,
     PrismaModule,
-    AuthModule],
+    AuthModule
+  ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],
 })
