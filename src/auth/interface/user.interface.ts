@@ -1,3 +1,9 @@
+
+interface Tasks {
+  task_name: string;
+  task_description: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -5,6 +11,7 @@ export interface User {
   role: string;
   avatar?: string;
   access_token?: accessToken;
+  tasks?: Tasks[];
 }
 
 export interface accessToken {

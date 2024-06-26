@@ -59,7 +59,21 @@ export class AuthService {
   }
 
   async profile(id: number) {
-    const user = await this.prisma.users.findUnique({ where: { id } });
+    const user = await this.prisma.users.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        role: true,
+        tasks: {
+          select: {
+            task_name: true,
+            task_description: true,
+          }
+        }
+      },});
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -84,6 +98,7 @@ export class AuthService {
   }
 
   private buildResponse(user: User, message: string, access_token = null): { message: string; data: Partial<User>; statusCode: number } {
+    
     const payload = {
       id: user.id,
       name: user.name,
@@ -91,11 +106,17 @@ export class AuthService {
       role: user.role,
       avatar: user.avatar,
       access_token,
+      tasks: []
     }
 
     if (!access_token) {
       delete payload['access_token'];   
+      
+      if (user.tasks.length > 0) {
+        payload['tasks'] = user.tasks
+      }
     }
+
 
     return {
       message: message,
