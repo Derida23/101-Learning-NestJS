@@ -8,6 +8,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
  
@@ -18,9 +20,10 @@ import { AuthController } from './auth/auth.controller';
     TrainingModule,
     TaskModule,
     PrismaModule,
-    AuthModule
+    AuthModule,
+    CloudinaryModule
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, CloudinaryService],
 })
 export class AppModule {}

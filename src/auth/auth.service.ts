@@ -68,6 +68,21 @@ export class AuthService {
     return this.buildResponse(user, "Successfully get profile")
   }
 
+  async uploadImage(id: number, avatar: string) {
+    const user = await this.prisma.users.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updateAvatar = await this.prisma.users.update({
+      where: { id },
+      data: { avatar },
+    })
+
+    return this.buildResponse(updateAvatar, "Successfully uploaded image")
+  }
+
   private buildResponse(user: User, message: string, access_token = null): { message: string; data: Partial<User>; statusCode: number } {
     const payload = {
       id: user.id,
